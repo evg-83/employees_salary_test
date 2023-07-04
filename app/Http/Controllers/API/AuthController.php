@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\AuthRequest;
+use App\Http\Resources\UserAuth\UserAuthResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,8 @@ class AuthController extends Controller
     public function register(AuthRequest $request)
     {
         try {
+            $dataUser = $request->validated();
+
             $dataUser = [
                 'email'    => $request->email,
                 'password' => Hash::make($request->password),
@@ -21,13 +24,13 @@ class AuthController extends Controller
 
             $user = User::firstOrCreate($dataUser);
 
-            $success['token'] = $user->createToken('MyApp')->plainTextToken;
-            $success['email'] = $user->email;
+            $response = [
+                'message' => 'User successfully registered.',
+                'token'   => $user->createToken('MyApp')->plainTextToken,
+                'data'    => UserAuthResource::make($user),
+            ];
 
-            return response()->json([
-                'message' => "User successfully registered.",
-                'data'    => $success
-            ], 200);
+            return response()->json($response, 200);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => "Something went really wrong!"
@@ -64,10 +67,10 @@ class AuthController extends Controller
         }
     }
 
-    public function logout(AuthRequest $request)
+    public function logout(Request $request)
     {
         try {
-            Auth::logout();
+            $request->user()->tokens()->delete();
 
             return response()->json([
                 'message' => "User successfully logout."

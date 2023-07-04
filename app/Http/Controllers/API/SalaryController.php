@@ -4,8 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Salary\SalaryRequest;
+use App\Http\Resources\Salary\SalaryResource;
 use App\Models\Salary;
 use App\Models\User;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class SalaryController extends Controller
@@ -26,12 +28,16 @@ class SalaryController extends Controller
             if (!empty($userData)) {
                 Salary::where('employee_id', $userAuthId)->increment('hours', $data['hours']);
             } else {
-                Salary::create($data);
+                $salary = Salary::create($data);
             }
 
-            return response()->json([
+            $response = [
+                'success' => true,
+                'data'    => SalaryResource::make($salary),
                 'message' => 'Employee details entered successfully.',
-            ], 200);
+            ];
+
+            return response()->json($response, 200);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => "Something went really wrong!"
@@ -56,7 +62,9 @@ class SalaryController extends Controller
                     ->value('employee_id');
             }
 
-            return response()->json($userEmployeeId . ': ' . $userPayAmount, 200);
+            $userSalary = Arr::add([$userEmployeeId=>$userPayAmount], $userEmployeeId, $userPayAmount);
+
+            return response()->json($userSalary, 200);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => "Something went really wrong!"

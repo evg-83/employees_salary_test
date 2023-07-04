@@ -41,12 +41,11 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        // 'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
 
-    public function salaries()
+    public function salary()
     {
-        return $this->hasOne( Salary::class);
+        return $this->hasOne( Salary::class, 'employee_id', 'id');
     }
 }

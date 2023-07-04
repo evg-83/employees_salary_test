@@ -13,12 +13,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/store', [App\Http\Controllers\API\SalaryController::class, 'store']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/store', [App\Http\Controllers\API\SalaryController::class, 'store']);
     Route::get('/show/{user}', [App\Http\Controllers\API\SalaryController::class, 'show']);
     Route::delete('/show/{user}', [App\Http\Controllers\API\SalaryController::class, 'destroy']);
-    Route::post('/logout', [App\Http\Controllers\API\AuthController::class, 'logout']);
+    Route::get('/logout', [App\Http\Controllers\API\AuthController::class, 'logout']);
 });
 
 
